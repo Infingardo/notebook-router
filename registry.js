@@ -715,7 +715,7 @@ const REGISTRY = {
       "label": "pezzo operatorio"
     }
   ],
-  "prefisso_domanda": "Sulla base delle fonti dei notebook allegati, ",
+  "prefisso_domanda": "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, ",
   "suffisso_domanda": "Per ogni affermazione indica la fonte; se un punto non è nelle fonti, dillo.",
   "testi_app": {
     "sede_mancante": "Scegli una sede.",
@@ -734,10 +734,10 @@ const REGISTRY = {
     "avviso_pre_who5": "Fletcher 2021 e ROSAI 2018 precedono la WHO 5ª ed. → verificare nosologia e classificazioni molecolari.",
     "conflitti": "Se più precedenze insieme portano a più di 2 topici → mostra i candidati e chiedi.",
     "output": "> Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA [+ condizionali]\n> Motivo: <sede → topico; trigger → condizionali>\n> Domanda da incollare: \"<vedi regola sotto>\"\n",
-    "fraseggio_intro": "NON usare \"Diagnosi differenziale tra… / dammi la diagnosi\" → Gemini rifiuta\n(\"Sono solo un modello linguistico…\"). Formula SEMPRE in chiave descrittiva, adattando al tipo di quesito:\n",
+    "fraseggio_intro": "NON usare \"Diagnosi differenziale tra… / dammi la diagnosi\" → Gemini rifiuta\n(\"Sono solo un modello linguistico…\"). Formula SEMPRE in chiave descrittiva, adattando al tipo di quesito\n({NOTEBOOK} = elenco dei notebook proposti, tra virgolette; tienili comunque attaccati dal \"+\"):\n",
     "note_operative": [
       "In Gemini: + → Altri caricamenti → Notebooks → seleziona → Aggiungi → digita → invia.",
-      "NON basta nominarli nel prompt: in una chat nuova Gemini risponde dalla propria memoria (testato 26 set 2026). Controlla sempre che la risposta citi le fonti dei notebook.",
+      "Gemini può consultare i notebook da solo, ma la scelta è incostante (26 set 2026: gastrite corretta, tiroide senza ORL) e nominarli nel prompt non basta. Attaccali sempre dal \"+\" e controlla quali notebook cita la risposta.",
       "La pagina Notebook di Gemini (gemini.google.com/notebooks/view) NON mostra i notebook condivisi; il selettore \"+\" sì. Non è un problema di accesso.",
       "Il grounding è lento (~30-90s, \"Analisi in corso…\"): attendi.",
       "Se dopo 2–4 minuti la chat torna vuota senza risposta, reinvia: è un errore intermittente di Gemini, non un problema del set.",

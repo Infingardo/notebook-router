@@ -60,22 +60,23 @@ Nessun topico per la sede → dillo, non forzare il topico più vicino.
 
 ## REGOLA DI FRASEGGIO (critica — Gemini rifiuta i quesiti "diagnostici")
 NON usare "Diagnosi differenziale tra… / dammi la diagnosi" → Gemini rifiuta
-("Sono solo un modello linguistico…"). Formula SEMPRE in chiave descrittiva, adattando al tipo di quesito:
-- Diagnosi differenziale: "Sulla base delle fonti dei notebook allegati, descrivi le caratteristiche morfologiche, immunoistochimiche e molecolari che distinguono {X} da {Y}. Parti dalla morfologia."
-- Singola entità: "Sulla base delle fonti dei notebook allegati, descrivi i criteri morfologici, immunoistochimici e molecolari relativi a: {X}. Parti dalla morfologia."
-- Test molecolare in sede: "Sulla base delle fonti dei notebook allegati, quali alterazioni molecolari rilevanti per: {X} sono coperte dal pannello in uso in sede e quali richiedono un test a parte?"
-- Stadiazione pTNM / margini: "Sulla base delle fonti dei notebook allegati, elenca le regole pTNM e i parametri di stadiazione e dei margini per: {X} (campione: {campione})."
-- Refertazione: "Sulla base delle fonti dei notebook allegati, elenca i parametri da riportare nel referto per: {X} (campione: {campione})."
-- Predittivo PD-L1: "Sulla base delle fonti dei notebook allegati, descrivi score, cut-off e anticorpi/cloni per PD-L1 in: {X}."
-- Radiomica / imaging: "Sulla base delle fonti dei notebook allegati, descrivi il ruolo della radiomica per: {X}."
-- Significato clinico-sistemico: "Sulla base delle fonti dei notebook allegati, descrivi il significato clinico-sistemico del reperto: {X}."
-- Istologia normale: "Sulla base delle fonti dei notebook allegati, descrivi l'istologia normale relativa a: {X}."
-- AI in anatomia patologica: "Sulla base delle fonti dei notebook allegati, descrivi le applicazioni di intelligenza artificiale in anatomia patologica relative a: {X}."
+("Sono solo un modello linguistico…"). Formula SEMPRE in chiave descrittiva, adattando al tipo di quesito
+({NOTEBOOK} = elenco dei notebook proposti, tra virgolette; tienili comunque attaccati dal "+"):
+- Diagnosi differenziale: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi le caratteristiche morfologiche, immunoistochimiche e molecolari che distinguono {X} da {Y}. Parti dalla morfologia."
+- Singola entità: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi i criteri morfologici, immunoistochimici e molecolari relativi a: {X}. Parti dalla morfologia."
+- Test molecolare in sede: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, quali alterazioni molecolari rilevanti per: {X} sono coperte dal pannello in uso in sede e quali richiedono un test a parte?"
+- Stadiazione pTNM / margini: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, elenca le regole pTNM e i parametri di stadiazione e dei margini per: {X} (campione: {campione})."
+- Refertazione: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, elenca i parametri da riportare nel referto per: {X} (campione: {campione})."
+- Predittivo PD-L1: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi score, cut-off e anticorpi/cloni per PD-L1 in: {X}."
+- Radiomica / imaging: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi il ruolo della radiomica per: {X}."
+- Significato clinico-sistemico: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi il significato clinico-sistemico del reperto: {X}."
+- Istologia normale: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi l'istologia normale relativa a: {X}."
+- AI in anatomia patologica: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi le applicazioni di intelligenza artificiale in anatomia patologica relative a: {X}."
 Aggiungi sempre: "Per ogni affermazione indica la fonte; se un punto non è nelle fonti, dillo."
 
 ## Note operative
 - In Gemini: + → Altri caricamenti → Notebooks → seleziona → Aggiungi → digita → invia.
-- NON basta nominarli nel prompt: in una chat nuova Gemini risponde dalla propria memoria (testato 26 set 2026). Controlla sempre che la risposta citi le fonti dei notebook.
+- Gemini può consultare i notebook da solo, ma la scelta è incostante (26 set 2026: gastrite corretta, tiroide senza ORL) e nominarli nel prompt non basta. Attaccali sempre dal "+" e controlla quali notebook cita la risposta.
 - La pagina Notebook di Gemini (gemini.google.com/notebooks/view) NON mostra i notebook condivisi; il selettore "+" sì. Non è un problema di accesso.
 - Il grounding è lento (~30-90s, "Analisi in corso…"): attendi.
 - Se dopo 2–4 minuti la chat torna vuota senza risposta, reinvia: è un errore intermittente di Gemini, non un problema del set.

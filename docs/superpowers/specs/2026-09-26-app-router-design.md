@@ -79,7 +79,7 @@ traduzione, app mobile dedicata (la pagina resta leggibile su telefono).
   aggiunge un motivo esplicito "<nome> escluso: quesito non neoplastico".
 - I modelli di domanda non sono in una sezione a parte: ogni voce di `tipi_quesito` ha
   il proprio campo `modello` (testo con segnaposti `{X}`, `{Y}`, `{campione}`), e la
-  domanda finale è `prefisso_domanda + modello compilato + suffisso_domanda`
+  domanda finale è `prefisso_domanda + modello compilato + suffisso_domanda` (il prefisso contiene `{NOTEBOOK}`, sostituito con l'elenco dei notebook del set)
   (`prefisso_domanda`/`suffisso_domanda` sono due chiavi top-level del registry). La
   sezione fraseggio del BIGINO è generata da questi tre campi.
 - Restano le liste `sede` (parole chiave) dei topici: usate dall'app come alias di

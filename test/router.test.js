@@ -53,14 +53,29 @@ test("TNM: refertazione su biopsia no, su pezzo operatorio sì", () => {
   assert.ok(nomi(pezzo).includes("TNM - IX Edizione"));
 });
 
-test("domanda: modello compilato con prefisso e suffisso", () => {
+test("domanda: nomina i notebook proposti, poi modello compilato e suffisso", () => {
   const r = route({ ...base, sede: "Tiroide", tipo: "ddx", x: "NIFTP", y: "IEFVPTC" }, REG);
   assert.equal(
     r.domanda,
-    REG.prefisso_domanda +
+    'Usando SOLO i notebook "ORL", "ROSAI 2018" e "IMMUNOISTOCHIMICA" e sulla base delle loro fonti, ' +
       "descrivi le caratteristiche morfologiche, immunoistochimiche e molecolari che distinguono NIFTP da IEFVPTC. Parti dalla morfologia. " +
       REG.suffisso_domanda
   );
+});
+
+test("domanda: l'elenco dei notebook segue il set, compresi i condizionali", () => {
+  const r = route({ ...base, sede: "Prostata", tipo: "refertazione", campione: "pezzo_operatorio", x: "adenocarcinoma" }, REG);
+  assert.ok(
+    r.domanda.startsWith(
+      'Usando SOLO i notebook "UROPATOLOGIA", "PDTA prostata", "ROSAI 2018", "IMMUNOISTOCHIMICA" e "TNM - IX Edizione" e sulla base'
+    ),
+    r.domanda
+  );
+});
+
+test("domanda: {NOTEBOOK} nel testo inserito dall'utente non viene sostituito", () => {
+  const r = route({ ...base, sede: "Tiroide", tipo: "entita", x: "{NOTEBOOK}" }, REG);
+  assert.ok(r.domanda.includes("relativi a: {NOTEBOOK}."), r.domanda);
 });
 
 test("domanda: segnaposti non compilati restano visibili", () => {
