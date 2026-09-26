@@ -1,0 +1,6 @@
+{"answer": "La NIFTP è incapsulata [1] e ha nuclei di tipo papillare [2].",
+ "conversation_id": "conv-1", "is_follow_up": true, "turn_number": 3,
+ "references": [
+   {"source_id": "src-1", "citation_number": 1, "cited_text": "incapsulata o ben demarcata"},
+   {"source_id": "src-2", "citation_number": 2, "cited_text": "nuclear score 2-3"}
+ ]}
