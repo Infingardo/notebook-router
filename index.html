@@ -30,7 +30,9 @@
   .condiviso { color:var(--ok); } .privato { color:var(--priv); }
   .avviso { background:var(--avviso-bg); color:var(--avviso); border-radius:6px; padding:6px 8px; margin:8px 0; }
   #domanda { min-height:8em; background:var(--bg); }
-  button { font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--accento); background:var(--accento); color:var(--testo-bottone); cursor:pointer; }
+  button, a.bottone { font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--accento); background:var(--accento); color:var(--testo-bottone); cursor:pointer; text-decoration:none; display:inline-block; }
+  .azioni { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .passi { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
   ul.motivi { color:var(--muted); font-size:.9rem; padding-left:1.2em; }
   footer { color:var(--muted); font-size:.9rem; margin-top:24px; }
 </style>
@@ -183,11 +185,17 @@
       const mancanti = r.domanda.match(/\{\w+\}/g);
       if (mancanti) h += '<p class="avviso">Completa: ' + esc([...new Set(mancanti)].join(", ")) + "</p>";
       h += '<h2>Domanda da incollare</h2><textarea id="domanda" readonly aria-label="Domanda da incollare">' + esc(r.domanda) +
-           '</textarea><p><button type="button" id="copia">Copia</button> <span id="copiato"></span></p>';
+           '</textarea><p class="azioni"><button type="button" id="copia">Copia</button>' +
+           '<a class="bottone" id="apri-gemini" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">Copia e apri Gemini</a>' +
+           ' <span id="copiato"></span></p>' +
+           '<p class="passi">In Gemini: + → Altri caricamenti → Notebook → spunta i notebook elencati sopra → Aggiungi → incolla la domanda (Cmd/Ctrl+V) → invia.</p>';
     }
     $("risultato").innerHTML = h;
     const b = $("copia");
     if (b) b.addEventListener("click", copia);
+    // Il link apre Gemini (mai bloccato come popup); il click copia la domanda negli appunti.
+    const g = $("apri-gemini");
+    if (g) g.addEventListener("click", copia);
   }
 
   riempiSedi($("sede"), R.sedi_menu, "");
