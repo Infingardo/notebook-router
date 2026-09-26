@@ -19,6 +19,11 @@
     });
   }
 
+  function elencoNotebook(nomi) {
+    const q = nomi.map((n) => '"' + n + '"');
+    return q.length > 1 ? q.slice(0, -1).join(", ") + " e " + q[q.length - 1] : q.join("");
+  }
+
   function route(input, reg) {
     const out = { notebook: [], motivi: [], avvisi: [], domanda: "" };
     const tutti = reg.topici.concat(reg.generalisti_always, reg.generalisti_conditional);
@@ -98,14 +103,13 @@
     });
 
     // 5. Domanda: il prefisso nomina i notebook del set ({NOTEBOOK}), compilato a parte dal testo dell'utente
-    const elenco = out.notebook.map((n) => '"' + n.name + '"');
-    const notebook = elenco.length > 1 ? elenco.slice(0, -1).join(", ") + " e " + elenco[elenco.length - 1] : elenco.join("");
+    const notebook = elencoNotebook(out.notebook.map((n) => n.name));
     out.domanda = compila(reg.prefisso_domanda, { NOTEBOOK: notebook }) +
       compila(tipo.modello, { X: input.x, Y: input.y, campione: campione ? campione.label : "" }) +
       " " + reg.suffisso_domanda;
     return out;
   }
 
-  if (typeof module === "object" && module && module.exports) module.exports = { route: route };
+  if (typeof module === "object" && module && module.exports) module.exports = { route: route, elencoNotebook: elencoNotebook };
   else globalThis.route = route;
 })();

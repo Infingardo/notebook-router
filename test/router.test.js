@@ -238,3 +238,10 @@ test("compila: x/y assenti o null non producono 'undefined'/'null', segnaposto r
   assert.ok(!nullo.domanda.includes("undefined"));
   assert.ok(!nullo.domanda.includes("null"));
 });
+
+test("elencoNotebook: uno, due, tre nomi", () => {
+  const { elencoNotebook } = require("../router.js");
+  assert.equal(elencoNotebook(["ORL"]), '"ORL"');
+  assert.equal(elencoNotebook(["ORL", "ROSAI 2018"]), '"ORL" e "ROSAI 2018"');
+  assert.equal(elencoNotebook(["A", "B", "C"]), '"A", "B" e "C"');
+});
