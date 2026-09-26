@@ -9,26 +9,25 @@ const path = require("node:path");
 const { route, elencoNotebook } = require("./router.js");
 
 const INTRO = "Domanda indipendente dalle precedenti: ";
-// Solo lettura + ask in coda: nessun comando che cancelli o modifichi i notebook.
-const COMANDI_AMMESSI = { auth: ["check"], list: [], source: ["list"], ask: [] };
-const OPZIONI_VIETATE = ["--new", "-c", "--conversation-id", "--save-as-note", "--yes", "-y"];
+const TIMEOUT_MS = 150000; // per chiamata: 3 notebook restano entro i 10 minuti dello strumento Bash
 
-function controllaArgomenti(args) {
-  const cmd = args[0];
-  const sub = args[1];
-  if (!Object.prototype.hasOwnProperty.call(COMANDI_AMMESSI, cmd)) throw new Error("comando notebooklm non ammesso: " + cmd);
-  const subs = COMANDI_AMMESSI[cmd];
-  if (subs.length && !subs.includes(sub)) throw new Error("sottocomando non ammesso: " + cmd + " " + sub);
-  for (const a of args.slice(cmd === "ask" ? 2 : 1)) {
-    if (OPZIONI_VIETATE.includes(a)) throw new Error("opzione vietata: " + a);
-  }
+// Elenco chiuso delle sole forme ammesse (solo lettura + ask in coda). Qualunque altra forma —
+// in particolare --new, che cancella la conversazione del notebook — viene rifiutata.
+const libero = (v) => typeof v === "string" && v !== "" && !v.startsWith("-");
+function controllaArgomenti(a) {
+  const ok =
+    (a.length === 3 && a[0] === "auth" && a[1] === "check" && a[2] === "--json") ||
+    (a.length === 2 && a[0] === "list" && a[1] === "--json") ||
+    (a.length === 5 && a[0] === "source" && a[1] === "list" && a[2] === "-n" && libero(a[3]) && a[4] === "--json") ||
+    (a.length === 5 && a[0] === "ask" && libero(a[1]) && a[2] === "-n" && libero(a[3]) && a[4] === "--json");
+  if (!ok) throw new Error("comando notebooklm non ammesso: " + a.map((x) => (x.length > 40 ? x.slice(0, 40) + "…" : x)).join(" "));
 }
 
 function eseguiReale(bin) {
   return (args) => {
     controllaArgomenti(args);
-    const r = spawnSync(bin, args, { encoding: "utf8", timeout: 240000 });
-    if (r.error) return { status: 1, stdout: "", stderr: String(r.error.message) };
+    const r = spawnSync(bin, args, { encoding: "utf8", timeout: TIMEOUT_MS });
+    if (r.error) return { status: 1, stdout: "", stderr: r.error.code === "ETIMEDOUT" ? "timeout" : String(r.error.message) };
     return { status: r.status === null ? 1 : r.status, stdout: r.stdout, stderr: r.stderr };
   };
 }
@@ -75,7 +74,7 @@ function trovaId(nome, notebooks) {
 }
 
 function domandaPerNotebook(r, reg, nome) {
-  const prefissoApp = reg.prefisso_domanda.replace("{NOTEBOOK}", elencoNotebook(r.notebook.map((n) => n.name)));
+  const prefissoApp = reg.prefisso_domanda.replace("{NOTEBOOK}", () => elencoNotebook(r.notebook.map((n) => n.name)));
   if (!r.domanda.startsWith(prefissoApp)) throw new Error("domanda inattesa: prefisso non riconosciuto");
   return INTRO + 'usando SOLO questo notebook ("' + nome + '") e sulla base delle sue fonti, ' + r.domanda.slice(prefissoApp.length);
 }
@@ -87,6 +86,12 @@ function interroga(input, reg, esegui) {
     out.stato = "fermo";
     return out;
   }
+  const mancanti = r.domanda.match(/\{\w+\}/g);
+  if (mancanti) {
+    out.stato = "fermo";
+    out.avvisi.push("Completa prima di interrogare: " + Array.from(new Set(mancanti)).join(", "));
+    return out;
+  }
   if (esegui(["auth", "check", "--json"]).status !== 0) {
     out.stato = "login";
     out.avvisi.push("Login NotebookLM non valido: esegui 'notebooklm login'.");
@@ -94,7 +99,14 @@ function interroga(input, reg, esegui) {
   }
   let elenco;
   try {
-    elenco = estraiNotebook(leggiJson(esegui(["list", "--json"]).stdout, "list"));
+    const l = esegui(["list", "--json"]);
+    if (l.status !== 0 && /AUTH_ERROR/.test(l.stdout)) {
+      out.stato = "login";
+      out.avvisi.push("Sessione NotebookLM scaduta: esegui 'notebooklm login'.");
+      return out;
+    }
+    if (l.status !== 0) throw new Error("list fallito (codice " + l.status + ")");
+    elenco = estraiNotebook(leggiJson(l.stdout, "list"));
   } catch (e) {
     out.stato = "fermo";
     out.avvisi.push(e.message);
@@ -113,20 +125,27 @@ function interroga(input, reg, esegui) {
     return out;
   }
   for (const n of r.notebook) {
-    const risposta = { name: n.name, id: ids[n.name], testo: null, riferimenti: [], errore: null };
+    const risposta = { name: n.name, id: ids[n.name], testo: null, riferimenti: [], errore: null, errore_fonti: null };
     try {
       const a = esegui(["ask", domandaPerNotebook(r, reg, n.name), "-n", ids[n.name], "--json"]);
-      if (a.status !== 0) throw new Error("ask fallito (codice " + a.status + ")");
+      if (a.status !== 0) throw new Error("ask fallito (codice " + a.status + (a.stderr === "timeout" ? ", timeout" : "") + ")");
       Object.assign(risposta, estraiRisposta(leggiJson(a.stdout, "ask")));
-      if (risposta.riferimenti.length) {
-        const fonti = estraiFonti(leggiJson(esegui(["source", "list", "-n", ids[n.name], "--json"]).stdout, "source list"));
-        for (const x of risposta.riferimenti) {
-          const f = fonti.find((s) => s.id === x.fonte_id);
-          x.fonte = f ? f.titolo : null;
-        }
-      }
     } catch (e) {
       risposta.errore = e.message;
+    }
+    if (!risposta.errore && risposta.riferimenti.length) {
+      // La risposta è già nella chat: un errore sui titoli delle fonti non deve cancellarla.
+      try {
+        const s = esegui(["source", "list", "-n", ids[n.name], "--json"]);
+        if (s.status !== 0) throw new Error("source list fallito (codice " + s.status + ")");
+        const fonti = estraiFonti(leggiJson(s.stdout, "source list"));
+        for (const x of risposta.riferimenti) {
+          const f = fonti.find((z) => z.id === x.fonte_id);
+          x.fonte = f ? f.titolo : null;
+        }
+      } catch (e) {
+        risposta.errore_fonti = e.message;
+      }
     }
     out.risposte.push(risposta);
   }

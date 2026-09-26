@@ -17,8 +17,14 @@ function finto(opz = {}) {
     chiamate.push(args);
     const [cmd] = args;
     if (cmd === "auth") return { status: opz.authFallisce ? 1 : 0, stdout: "{}", stderr: "" };
-    if (cmd === "list") return { status: 0, stdout: opz.list || FIX("list.json"), stderr: "" };
-    if (cmd === "source") return { status: 0, stdout: FIX("source-list.json"), stderr: "" };
+    if (cmd === "list") {
+      if (opz.listAuth) return { status: 1, stdout: '{"error": true, "code": "AUTH_ERROR", "message": "x"}', stderr: "" };
+      return { status: 0, stdout: opz.list || FIX("list.json"), stderr: "" };
+    }
+    if (cmd === "source") {
+      if (opz.sourceFallisce) return { status: 1, stdout: "", stderr: "errore" };
+      return { status: 0, stdout: FIX("source-list.json"), stderr: "" };
+    }
     if (cmd === "ask") {
       const id = args[args.indexOf("-n") + 1];
       if (opz.askErrore === id) return { status: 1, stdout: "", stderr: "timeout" };
@@ -45,7 +51,7 @@ test("riferimenti convertiti in titoli delle fonti", () => {
   const out = interroga(TIROIDE, REG, finto().esegui);
   const r = out.risposte[0];
   assert.equal(r.testo.startsWith("La NIFTP"), true);
-  assert.deepEqual(r.riferimenti.map((x) => x.fonte), ["Tumori della tiroide low risk", "Rosai_Chapter 08 Thyroid gland.pdf"]);
+  assert.deepEqual(r.riferimenti.map((x) => x.fonte), ["Tumori della tiroide low risk", "Capitolo di prova tiroide.pdf"]);
   assert.equal(r.riferimenti[0].numero, 1);
   assert.equal(r.riferimenti[0].estratto, "incapsulata o ben demarcata");
 });
@@ -121,4 +127,34 @@ test("domandaPerNotebook sostituisce il prefisso dell'app", () => {
   const d = domandaPerNotebook(r, REG, "ORL");
   assert.ok(d.startsWith('Domanda indipendente dalle precedenti: usando SOLO questo notebook ("ORL") e sulla base delle sue fonti, descrivi'));
   assert.ok(!d.includes('"ROSAI 2018"'));
+});
+
+test("sessione scaduta (list risponde AUTH_ERROR) → stato login, nessuna domanda", () => {
+  const f = finto({ listAuth: true });
+  const out = interroga(TIROIDE, REG, f.esegui);
+  assert.equal(out.stato, "login");
+  assert.equal(f.chiamate.filter((a) => a[0] === "ask").length, 0);
+});
+
+test("guardia a elenco chiuso: forme non previste rifiutate", () => {
+  for (const a of [["ask", "--new", "-n", "x", "--json"], ["ask", "q", "-n", "x", "--json", "-s", "s1"], ["ask", "q", "--prompt-file", "f", "-n", "x", "--json"], ["list", "--foo"], ["auth", "check", "--test"], ["ask", "q", "-n", "--new", "--json"], ["source", "list", "-n", "x"]]) {
+    assert.throws(() => controllaArgomenti(a), /non ammess|vietat/, a.join(" "));
+  }
+});
+
+test("segnaposti non compilati → fermo, nessuna chiamata", () => {
+  const f = finto();
+  const out = interroga({ sede: "Tiroide", natura: "neoplastica", tipo: "ddx", x: "NIFTP" }, REG, f.esegui);
+  assert.equal(out.stato, "fermo");
+  assert.ok(out.avvisi.some((a) => /\{Y\}/.test(a)));
+  assert.equal(f.chiamate.length, 0);
+});
+
+test("source list in errore: la risposta resta, fonti non risolte e segnalate", () => {
+  const out = interroga(TIROIDE, REG, finto({ sourceFallisce: true }).esegui);
+  const r = out.risposte[0];
+  assert.equal(r.errore, null);
+  assert.ok(r.testo.startsWith("La NIFTP"));
+  assert.equal(r.riferimenti[0].fonte, null);
+  assert.match(r.errore_fonti, /source list/);
 });

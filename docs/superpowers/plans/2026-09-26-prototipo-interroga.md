@@ -121,7 +121,7 @@ Adattare le chiavi alla forma annotata negli Step 4–5; se coincide con quella 
 ```json
 {"sources": [
   {"id": "src-1", "title": "Tumori della tiroide low risk"},
-  {"id": "src-2", "title": "Rosai_Chapter 08 Thyroid gland.pdf"}
+  {"id": "src-2", "title": "Capitolo di prova tiroide.pdf"}
 ]}
 ```
 `test/fixtures/notebooklm/ask.json`:
@@ -256,7 +256,7 @@ test("riferimenti convertiti in titoli delle fonti", () => {
   const out = interroga(TIROIDE, REG, finto().esegui);
   const r = out.risposte[0];
   assert.equal(r.testo.startsWith("La NIFTP"), true);
-  assert.deepEqual(r.riferimenti.map((x) => x.fonte), ["Tumori della tiroide low risk", "Rosai_Chapter 08 Thyroid gland.pdf"]);
+  assert.deepEqual(r.riferimenti.map((x) => x.fonte), ["Tumori della tiroide low risk", "Capitolo di prova tiroide.pdf"]);
   assert.equal(r.riferimenti[0].numero, 1);
   assert.equal(r.riferimenti[0].estratto, "incapsulata o ben demarcata");
 });
