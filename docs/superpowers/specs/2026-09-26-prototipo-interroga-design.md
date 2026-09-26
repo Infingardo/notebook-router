@@ -54,7 +54,7 @@ Fuori dal repo:
   sintesi, risposte grezze, data.
 - `notebooklm-py` in un ambiente Python isolato e il login Google, fatto dall'utente
   (`notebooklm login`).
-- Eventuale file locale con gli ID delle conversazioni dedicate (vedi sezione 2).
+- Nessun file di stato: le domande vanno in coda alla chat di ciascun notebook (vedi sezione 2).
 
 Flusso:
 ```
@@ -66,13 +66,19 @@ Flusso:
 
 ## 2. Errori e sicurezza
 
-Conversazioni NotebookLM (rischio principale): `ask` riprende l'ultima conversazione del
-notebook; `ask --new` la **cancella** definitivamente.
-- Lo script non usa mai `--new` e rifiuta qualunque argomento che lo contenga.
-- Una prova preliminare su un notebook di test ("router-test") stabilisce come aprire una
-  conversazione nuova senza toccare quelle dell'utente. Se non esiste un modo sicuro: una
-  conversazione dedicata al router per notebook (`-c <id>`), con gli ID in un file locale fuori
-  dal repo, dichiarato all'utente.
+Conversazioni NotebookLM (rischio principale): dal codice di `notebooklm-py`, `ask` senza
+`-c` prosegue la conversazione più recente del notebook (la chat visibile in NotebookLM);
+`ask --new` la **cancella** definitivamente; non risulta un modo per aprire una conversazione
+separata senza cancellare la precedente (da confermare nella prova preliminare).
+Decisione dell'utente (26 set 2026): le domande del router vengono **aggiunte in coda** alla
+chat esistente di ciascun notebook; nulla viene cancellato.
+- Lo script usa solo i comandi `auth check`, `list`, `source list`, `ask` (senza `--new`,
+  `-c`, `--save-as-note`) e rifiuta qualunque altro comando o opzione (in particolare `--new`,
+  `configure`, `delete`, `history`).
+- Ogni domanda inizia con "Domanda indipendente dalle precedenti:" per ridurre l'effetto delle
+  domande già presenti nella chat.
+- La prova preliminare si fa su un notebook di test ("router-test"), non sui notebook di
+  patologia.
 
 | Situazione | Comportamento |
 |---|---|
@@ -92,8 +98,8 @@ skill ricorda il divieto di dati di paziente.
 ## 3. Test e ordine di lavoro
 
 1. **Prova preliminare** (con l'utente presente): installazione di `notebooklm-py` in ambiente
-   isolato; login dell'utente; su "router-test" verifica di formato di `list --json` e `ask --json`,
-   apertura di conversazioni nuove senza cancellazioni, tempi di risposta. Se lo strumento non
+   isolato; login dell'utente; su "router-test" verifica di formato di `list --json`, `source list --json` e `ask --json`,
+   comportamento delle conversazioni (ask in coda, nessuna cancellazione), tempi di risposta. Se lo strumento non
    funziona o è instabile, ci si ferma qui.
 2. **`interroga.js` in TDD**: i test non chiamano Google — `notebooklm` è sostituito da un finto
    eseguibile con output registrati nella prova. Casi: set corretto, conversione nomi→ID, notebook
