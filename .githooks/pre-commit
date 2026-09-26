@@ -1,0 +1,23 @@
+#!/bin/sh
+# Blocca il commit se i file generati non sono allineati a registry.yaml o se i test falliscono.
+# Lavora su una copia della versione in staging (quella che verrebbe committata).
+set -e
+command -v ruby >/dev/null 2>&1 || { echo "pre-commit: ruby non trovato."; exit 1; }
+command -v node >/dev/null 2>&1 || { echo "pre-commit: node non trovato."; exit 1; }
+radice=$(git rev-parse --show-toplevel)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+trap 'exit 1' INT TERM
+cd "$radice"
+git checkout-index -a --prefix="$tmp/"
+cd "$tmp"
+if ! ruby genera.rb --check; then
+  echo "pre-commit: esegui 'ruby genera.rb' e aggiungi i file generati al commit."
+  exit 1
+fi
+if ! uscita=$(node --test 2>&1); then
+  echo "$uscita" | tail -40
+  echo "pre-commit: test falliti."
+  exit 1
+fi
+echo "pre-commit: test ok."

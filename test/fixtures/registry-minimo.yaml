@@ -1,0 +1,39 @@
+topici:
+  - {name: "ALFA", condiviso: true, bigino: "copre alfa.", sede: [alfa]}
+  - {name: "BETA", condiviso: false, bigino: "copre beta.", sede: [beta]}
+generalisti_always:
+  - {name: "GEN", condiviso: false}
+generalisti_conditional:
+  - {name: "FLE", condiviso: false, trigger: neoplastico_senza_topico, bigino: "tumori senza topico."}
+  - {name: "HAR", condiviso: true, trigger: medico_senza_topico, tipi: [clinico], bigino: "clinico."}
+  - {name: "STA", condiviso: true, tipi: [stadiazione, "refertazione:pezzo"], bigino: "stadiazione."}
+sedi_menu:
+  - {gruppo: "G1", voce: "Alfa", topici: [ALFA]}
+  - {gruppo: "G1", voce: "Alfa e beta", topici: [ALFA, BETA], precedenza: "alfa e beta → top-2"}
+  - {gruppo: "G1", voce: "Beta medica", topici: [BETA], topici_non_neoplastico: []}
+  - {gruppo: "G2", voce: "Vuota", topici: []}
+  - {gruppo: "G2", voce: "Vuota senza fle", topici: [], senza_fletcher: true, nota: "solo generalisti."}
+  - {gruppo: "G2", voce: "Sentinella", speciale: sentinella}
+  - {gruppo: "G2", voce: "Altro", speciale: altro}
+tipi_quesito:
+  - {id: ddx, label: "DDx", modello: "distingui {X} da {Y}."}
+  - {id: clinico, label: "Clinico", modello: "significato di {X}."}
+  - {id: stadiazione, label: "Stadiazione", campione: true, modello: "stadia {X} su {campione}."}
+  - {id: refertazione, label: "Refertazione", campione: true, modello: "referta {X} su {campione}."}
+campioni:
+  - {id: biopsia, label: "biopsia"}
+  - {id: pezzo, label: "pezzo operatorio"}
+prefisso_domanda: "Sulla base delle fonti, "
+suffisso_domanda: "Cita le fonti."
+testi_app: {sede_mancante: "Scegli una sede.", sede_non_mappata: "Non mappata.", sentinella_senza_primitivo: "Indica il primitivo.", natura_mancante: "Indica la natura.", tipo_mancante: "Scegli il tipo.", campione_mancante: "Indica il campione."}
+bigino_testi:
+  titolo: "T"
+  intro: "I"
+  sede: "S"
+  copertura: "C"
+  nessun_topico: "N"
+  avviso_pre_who5: "W"
+  conflitti: "K"
+  output: "O"
+  fraseggio_intro: "F"
+  note_operative: ["n1"]

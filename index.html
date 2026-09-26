@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notebook router</title>
+<style>
+  :root { --bg:#fafafa; --fg:#1d1d1f; --muted:#666; --card:#fff; --bordo:#ddd; --accento:#1a5fb4; --testo-bottone:#fff;
+          --avviso:#8a5200; --avviso-bg:#fff4e0; --ok:#1e7a3c; --priv:#a02020; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#161618; --fg:#eee; --muted:#aaa; --card:#222226; --bordo:#3a3a40; --accento:#78aeed; --testo-bottone:#10243a;
+            --avviso:#f0b35a; --avviso-bg:#3a2c12; --ok:#6fd08c; --priv:#f08a8a; }
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 system-ui, sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:16px; }
+  h1 { font-size:1.4rem; margin:.2rem 0 1rem; }
+  h2 { font-size:1.05rem; margin:1rem 0 .4rem; }
+  fieldset { border:1px solid var(--bordo); border-radius:8px; background:var(--card); margin:0 0 12px; padding:10px 12px; }
+  legend { font-weight:600; padding:0 4px; }
+  legend .nota { font-weight:400; font-size:.85rem; color:var(--muted); }
+  label { display:block; margin:6px 0 2px; }
+  .riga { display:flex; gap:16px; flex-wrap:wrap; }
+  .riga label { display:inline-flex; gap:6px; align-items:center; }
+  select, input[type=text], input[type=search], textarea { width:100%; box-sizing:border-box; font:inherit;
+          padding:6px 8px; border:1px solid var(--bordo); border-radius:6px; background:var(--card); color:var(--fg); }
+  .nascosto { display:none; }
+  #risultato { background:var(--card); border:1px solid var(--bordo); border-radius:8px; padding:4px 12px 12px; }
+  .nb { display:flex; justify-content:space-between; gap:8px; padding:5px 0; border-bottom:1px dashed var(--bordo); }
+  .etichetta { font-size:.8rem; white-space:nowrap; }
+  .condiviso { color:var(--ok); } .privato { color:var(--priv); }
+  .avviso { background:var(--avviso-bg); color:var(--avviso); border-radius:6px; padding:6px 8px; margin:8px 0; }
+  #domanda { min-height:8em; background:var(--bg); }
+  button { font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--accento); background:var(--accento); color:var(--testo-bottone); cursor:pointer; }
+  ul.motivi { color:var(--muted); font-size:.9rem; padding-left:1.2em; }
+  footer { color:var(--muted); font-size:.9rem; margin-top:24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Notebook router</h1>
+  <p id="errore" class="avviso nascosto"></p>
+  <form id="form" autocomplete="off">
+    <fieldset>
+      <legend>Sede</legend>
+      <input type="search" id="filtro" placeholder="Cerca sede…" aria-label="Cerca sede">
+      <label for="sede">Sede</label>
+      <select id="sede"><option value="">— scegli —</option></select>
+      <div id="blocco-primitivo" class="nascosto">
+        <label for="primitivo">Sede del tumore primitivo</label>
+        <select id="primitivo"><option value="">— scegli —</option></select>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Natura <span id="nota-sentinella" class="nota nascosto">(linfonodo sentinella: sempre neoplastica)</span></legend>
+      <div class="riga">
+        <label><input type="radio" name="natura" value="neoplastica"> neoplastica</label>
+        <label><input type="radio" name="natura" value="non_neoplastica"> non neoplastica</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Quesito</legend>
+      <label for="tipo">Tipo di quesito</label>
+      <select id="tipo"><option value="">— scegli —</option></select>
+      <div id="blocco-campione" class="nascosto">
+        <label for="campione">Campione</label>
+        <select id="campione"><option value="">— scegli —</option></select>
+      </div>
+      <label for="x">Entità X</label>
+      <input type="text" id="x" placeholder="es. carcinoma a cellule aciniche">
+      <div id="blocco-y" class="nascosto">
+        <label for="y">Entità Y</label>
+        <input type="text" id="y" placeholder="es. carcinoma secretorio">
+      </div>
+    </fieldset>
+  </form>
+  <p id="stato" class="avviso nascosto" aria-live="polite"></p>
+  <section id="risultato"></section>
+  <footer>
+    <h2>Come si usa in Gemini</h2>
+    <ul id="note"></ul>
+    <p>Regole e dati generati da registry.yaml. Solo materiale anonimo/di studio: mai dati di paziente.</p>
+  </footer>
+</main>
+<script src="registry.js"></script>
+<script src="router.js"></script>
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  if (typeof REGISTRY === "undefined" || typeof route !== "function") {
+    $("errore").textContent = "Dati non caricati: registry.js o router.js mancanti.";
+    $("errore").classList.remove("nascosto");
+    return;
+  }
+  const R = REGISTRY;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
+
+  function corrisponde(v, filtro) {
+    if (!filtro) return true;
+    if (v.voce.toLowerCase().includes(filtro)) return true;
+    if (v.speciale) return false;
+    return (v.topici || []).some((nomeTopico) => {
+      const t = R.topici.find((t) => t.name === nomeTopico);
+      return t && (t.sede || []).some((k) => k.toLowerCase().includes(filtro));
+    });
+  }
+
+  function riempiSedi(select, voci, filtro) {
+    const prima = select.value;
+    select.textContent = "";
+    select.appendChild(new Option("— scegli —", ""));
+    const gruppi = new Map();
+    voci.forEach((v) => {
+      if (!corrisponde(v, filtro)) return;
+      if (!gruppi.has(v.gruppo)) gruppi.set(v.gruppo, []);
+      gruppi.get(v.gruppo).push(v);
+    });
+    gruppi.forEach((lista, gruppo) => {
+      const og = document.createElement("optgroup");
+      og.label = gruppo;
+      lista.forEach((v) => og.appendChild(new Option(v.voce, v.voce)));
+      select.appendChild(og);
+    });
+    if ([...select.options].some((o) => o.value === prima)) select.value = prima;
+    return gruppi.size > 0;
+  }
+
+  function leggi() {
+    return {
+      sede: $("sede").value,
+      primitivo: $("primitivo").value,
+      natura: (document.querySelector("input[name=natura]:checked") || {}).value || "",
+      tipo: $("tipo").value,
+      campione: $("campione").value,
+      x: $("x").value.trim(),
+      y: $("y").value.trim(),
+    };
+  }
+
+  function copia() {
+    const t = $("domanda");
+    const fatto = () => { $("copiato").textContent = "copiata"; $("stato").textContent = "copiata"; $("stato").classList.remove("nascosto"); };
+    const vecchio = () => {
+      t.select();
+      document.execCommand("copy") ? fatto() : ($("copiato").textContent = "copia manualmente");
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t.value).then(fatto, vecchio);
+    else vecchio();
+  }
+
+  function aggiorna(filtroSenzaRisultati) {
+    const input = leggi();
+    const voce = R.sedi_menu.find((v) => v.voce === input.sede);
+    const tipo = R.tipi_quesito.find((t) => t.id === input.tipo);
+    const sentinella = !!(voce && voce.speciale === "sentinella");
+    $("blocco-primitivo").classList.toggle("nascosto", !sentinella);
+    $("blocco-campione").classList.toggle("nascosto", !(tipo && tipo.campione));
+    $("blocco-y").classList.toggle("nascosto", !(tipo && tipo.modello.includes("{Y}")));
+    $("nota-sentinella").classList.toggle("nascosto", !sentinella);
+    document.querySelectorAll("input[name=natura]").forEach((r) => { r.disabled = sentinella; });
+
+    const r = route(input, R);
+    const avvisi = r.avvisi.slice();
+    if (filtroSenzaRisultati) avvisi.unshift("Nessuna sede corrisponde alla ricerca.");
+    if (avvisi.length) {
+      $("stato").textContent = avvisi.join(" ");
+      $("stato").classList.remove("nascosto");
+    } else {
+      $("stato").textContent = "";
+      $("stato").classList.add("nascosto");
+    }
+
+    let h = "";
+    if (r.notebook.length) {
+      h += "<h2>Notebook da attaccare</h2>";
+      r.notebook.forEach((n) => {
+        const cls = n.condiviso ? "condiviso" : "privato";
+        h += '<div class="nb"><span>' + esc(n.name) + '</span><span class="etichetta ' + cls + '">' + cls + "</span></div>";
+      });
+      h += '<h2>Motivo</h2><ul class="motivi">' + r.motivi.map((m) => "<li>" + esc(m) + "</li>").join("") + "</ul>";
+    }
+    if (r.domanda) {
+      const mancanti = r.domanda.match(/\{\w+\}/g);
+      if (mancanti) h += '<p class="avviso">Completa: ' + esc([...new Set(mancanti)].join(", ")) + "</p>";
+      h += '<h2>Domanda da incollare</h2><textarea id="domanda" readonly aria-label="Domanda da incollare">' + esc(r.domanda) +
+           '</textarea><p><button type="button" id="copia">Copia</button> <span id="copiato"></span></p>';
+    }
+    $("risultato").innerHTML = h;
+    const b = $("copia");
+    if (b) b.addEventListener("click", copia);
+  }
+
+  riempiSedi($("sede"), R.sedi_menu, "");
+  R.sedi_menu.filter((v) => !v.speciale && !v.non_primitivo).forEach((v) => $("primitivo").appendChild(new Option(v.voce, v.voce)));
+  R.tipi_quesito.forEach((t) => $("tipo").appendChild(new Option(t.label, t.id)));
+  R.campioni.forEach((c) => $("campione").appendChild(new Option(c.label, c.id)));
+  R.bigino_testi.note_operative.forEach((n) => {
+    const li = document.createElement("li");
+    li.textContent = n;
+    $("note").appendChild(li);
+  });
+
+  $("form").addEventListener("input", (e) => {
+    let filtroSenzaRisultati = false;
+    if (e.target.id === "filtro") {
+      const filtro = e.target.value.trim().toLowerCase();
+      const trovate = riempiSedi($("sede"), R.sedi_menu, filtro);
+      filtroSenzaRisultati = !!filtro && !trovate;
+    }
+    aggiorna(filtroSenzaRisultati);
+  });
+  $("form").addEventListener("submit", (e) => e.preventDefault());
+  aggiorna(false);
+})();
+</script>
+</body>
+</html>
