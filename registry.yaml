@@ -170,6 +170,7 @@ sedi_menu:
 tipi_quesito:
   - {id: ddx, label: "Diagnosi differenziale", modello: "descrivi le caratteristiche morfologiche, immunoistochimiche e molecolari che distinguono {X} da {Y}. Parti dalla morfologia."}
   - {id: entita, label: "Singola entità", modello: "descrivi i criteri morfologici, immunoistochimici e molecolari relativi a: {X}. Parti dalla morfologia."}
+  - {id: marcatore, label: "Marcatore / pannello IHC", modello: "descrivi i marcatori immunoistochimici per: {X} (pannello, pattern di colorazione atteso, criteri di interpretazione e di punteggio, controlli, trappole). Parti dal contesto morfologico."}
   - {id: test_sede, label: "Test molecolare in sede", modello: "quali alterazioni molecolari rilevanti per: {X} sono coperte dal pannello in uso in sede e quali richiedono un test a parte?"}
   - {id: stadiazione, label: "Stadiazione pTNM / margini", campione: true, modello: "elenca le regole pTNM e i parametri di stadiazione e dei margini per: {X} (campione: {campione})."}
   - {id: refertazione, label: "Refertazione", campione: true, modello: "elenca i parametri da riportare nel referto per: {X} (campione: {campione})."}

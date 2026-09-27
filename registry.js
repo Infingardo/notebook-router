@@ -667,6 +667,11 @@ const REGISTRY = {
       "modello": "descrivi i criteri morfologici, immunoistochimici e molecolari relativi a: {X}. Parti dalla morfologia."
     },
     {
+      "id": "marcatore",
+      "label": "Marcatore / pannello IHC",
+      "modello": "descrivi i marcatori immunoistochimici per: {X} (pannello, pattern di colorazione atteso, criteri di interpretazione e di punteggio, controlli, trappole). Parti dal contesto morfologico."
+    },
+    {
       "id": "test_sede",
       "label": "Test molecolare in sede",
       "modello": "quali alterazioni molecolari rilevanti per: {X} sono coperte dal pannello in uso in sede e quali richiedono un test a parte?"

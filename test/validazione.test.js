@@ -13,7 +13,7 @@ const CASI = [
   ["#3", "laringe: grading e fronte (eccezione confermata: stadiazione)", { sede: "Laringe e faringe", tipo: "stadiazione", campione: "pezzo_operatorio" }, ["ORL", R, I, TNM]],
   ["#4", "GBM: alterazioni da cercare", { sede: "Encefalo e midollo spinale", tipo: "test_sede" }, ["Cervello", R, I, NGS]],
   ["#5", "meningioma: grading (test in sede)", { sede: "Encefalo e midollo spinale", tipo: "test_sede" }, ["Cervello", R, I, NGS]],
-  ["#6", "HER2 e recettori", { sede: "Mammella", tipo: "entita" }, ["MAMMELLA", R]],
+  ["#6", "HER2 e recettori", { sede: "Mammella", tipo: "marcatore" }, ["MAMMELLA", R, I]],
   ["#7", "mammella pTNM e margini", { sede: "Mammella", tipo: "stadiazione", campione: "pezzo_operatorio" }, ["MAMMELLA", R, I, TNM]],
   ["#8", "sarcoma pleomorfo DDx", { sede: "Tessuti molli", tipo: "ddx" }, ["TESSUTI MOLLI", R, I]],
   ["#9", "lipoma vs LPS ben differenziato", { sede: "Tessuti molli", tipo: "ddx" }, ["TESSUTI MOLLI", R, I]],

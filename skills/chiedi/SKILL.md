@@ -15,6 +15,8 @@ Leggi `registry.yaml` e scegli:
 - `natura`: "neoplastica" o "non_neoplastica". Se il quesito è "neoplastico o reattivo?", usa
   "neoplastica" con tipo "ddx" (X = lesione reattiva, Y = neoplasia).
 - `tipo`: un `id` di `tipi_quesito`; `campione` (id di `campioni`) solo se il tipo lo prevede.
+  Quesito su un marcatore, un pannello o un punteggio IHC (es. HER2, p53, Ki67) → "marcatore", non
+  "entita" (che esclude IMMUNOISTOCHIMICA).
 - `x`, `y`: le entità, testo breve.
 
 ## 2. Mostra il set e aspetta l'ok

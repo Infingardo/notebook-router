@@ -262,3 +262,9 @@ test("tranne_tipi: tipo sconosciuto mantiene IMMUNOISTOCHIMICA", () => {
   const r = route({ ...base, sede: "Tiroide", tipo: "non_esiste" }, REG);
   assert.ok(nomi(r).includes("IMMUNOISTOCHIMICA"));
 });
+
+test("tipo marcatore: IMMUNOISTOCHIMICA inclusa, domanda sul marcatore", () => {
+  const r = route({ ...base, sede: "Mammella", tipo: "marcatore", x: "HER2" }, REG);
+  assert.deepEqual(nomi(r), ["IMMUNOISTOCHIMICA", "MAMMELLA", "ROSAI 2018"]);
+  assert.ok(r.domanda.includes("marcatori immunoistochimici per: HER2"), r.domanda);
+});

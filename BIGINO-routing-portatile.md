@@ -64,6 +64,7 @@ NON usare "Diagnosi differenziale tra… / dammi la diagnosi" → Gemini rifiuta
 ({NOTEBOOK} = elenco dei notebook proposti, tra virgolette; tienili comunque attaccati dal "+"):
 - Diagnosi differenziale: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi le caratteristiche morfologiche, immunoistochimiche e molecolari che distinguono {X} da {Y}. Parti dalla morfologia."
 - Singola entità: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi i criteri morfologici, immunoistochimici e molecolari relativi a: {X}. Parti dalla morfologia."
+- Marcatore / pannello IHC: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, descrivi i marcatori immunoistochimici per: {X} (pannello, pattern di colorazione atteso, criteri di interpretazione e di punteggio, controlli, trappole). Parti dal contesto morfologico."
 - Test molecolare in sede: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, quali alterazioni molecolari rilevanti per: {X} sono coperte dal pannello in uso in sede e quali richiedono un test a parte?"
 - Stadiazione pTNM / margini: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, elenca le regole pTNM e i parametri di stadiazione e dei margini per: {X} (campione: {campione})."
 - Refertazione: "Usando SOLO i notebook {NOTEBOOK} e sulla base delle loro fonti, elenca i parametri da riportare nel referto per: {X} (campione: {campione})."
