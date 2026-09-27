@@ -36,7 +36,7 @@ possono togliere.
 
 ## 3. Interroga
 `cd ~/Documents/Progetti/notebook-router && node interroga.js "$f"` — con lo strumento Bash usa
-`timeout: 600000` (la corsa dura 4–5 minuti). Se si interrompe, **non rilanciare alla cieca**: le
+`timeout: 600000` (i notebook sono interrogati in parallelo: circa 1,5–2 minuti, stima da misurare). Se si interrompe, **non rilanciare alla cieca**: le
 domande già inviate sono nella chat; chiedi all'utente se ripetere. Uscita:
 - `stato: "login"` → di' all'utente di eseguire `~/.venvs/notebooklm/bin/notebooklm login` e fermati.
 - `stato: "fermo"` → mostra gli avvisi e fermati.
@@ -56,7 +56,7 @@ Ordine: morfologia → immunoistochimica → molecolare (solo le parti pertinent
   notebook, es. ORL, impongono questo formato): riportale come `[NOTEBOOK: titolo — citazione
   testuale, non verificata]`; il titolo può non coincidere con quello reale della fonte.
   Risposte senza nessuna citazione: "NOTEBOOK: risposta non verificabile sulle fonti".
-- Tempi: circa 1–1,5 minuti per notebook (4–5 minuti per un set di 3); avvisa l'utente all'inizio.
+- Tempi: interrogazione in parallelo, circa quanto il notebook più lento (1,5–2 minuti, stima); avvisa l'utente all'inizio.
 - Discordanze tra notebook: riporta entrambe le versioni con le rispettive fonti.
 - Se il set include ROSAI 2018 o Fletcher 2021 senza topico aggiornato, ricorda che precedono la
   WHO 5ª ed.
