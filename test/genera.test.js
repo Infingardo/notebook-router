@@ -320,3 +320,16 @@ test("non_primitivo booleano (true o false) → registry valido", () => {
   );
   assert.equal(conFalse.status, 0, conFalse.stderr);
 });
+
+test("tranne_tipi con tipo inesistente → errore 2", () => {
+  const r = esegui(conModifica('{name: "GEN", condiviso: false}', '{name: "GEN", condiviso: false, tranne_tipi: [inesistente]}'));
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /GEN: tranne_tipi: tipo inesistente 'inesistente'/);
+});
+
+test("tranne_tipi valido → BIGINO riporta l'eccezione", () => {
+  const r = esegui(conModifica('{name: "GEN", condiviso: false}', '{name: "GEN", condiviso: false, tranne_tipi: [clinico]}'));
+  assert.equal(r.status, 0, r.stderr);
+  const bigino = fs.readFileSync(path.join(r.dir, "BIGINO-routing-portatile.md"), "utf8");
+  assert.match(bigino, /- SEMPRE: GEN \(tranne tipo: Clinico\)\./);
+});

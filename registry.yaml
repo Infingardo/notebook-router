@@ -76,6 +76,8 @@ generalisti_always:
     nota: "capitoli Rosai 1-45 (mancano 9 e 20) + protocolli di refertazione interni. Pre-WHO 5ª ed."
   - name: "IMMUNOISTOCHIMICA"
     condiviso: true
+    tranne_tipi: [entita]
+    nota: "escluso per la singola entità (27 set 2026): ridondante con topico + ROSAI, sulla NIFTP nessuna fonte pertinente. Resta per DDx e pannelli (unico con la disponibilità degli anticorpi in sede)."
 
 generalisti_conditional:
   - name: "Fletcher 2021"
@@ -204,7 +206,7 @@ bigino_testi:
   avviso_pre_who5: "Fletcher 2021 e ROSAI 2018 precedono la WHO 5ª ed. → verificare nosologia e classificazioni molecolari."
   conflitti: "Se più precedenze insieme portano a più di 2 topici → mostra i candidati e chiedi."
   output: |
-    > Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA [+ condizionali]
+    > Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA (non per la singola entità) [+ condizionali]
     > Motivo: <sede → topico; trigger → condizionali>
     > Domanda da incollare: "<vedi regola sotto>"
   fraseggio_intro: |

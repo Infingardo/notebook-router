@@ -8,12 +8,12 @@ const HAR = "Harrison 22 ed. Principi di Medicina Interna", FLE = "Fletcher 2021
 
 // [id, descrizione, input, set atteso]
 const CASI = [
-  ["#1", "sialoadenite necrotizzante", { sede: "Ghiandole salivari", natura: "non_neoplastica", tipo: "entita" }, ["ORL", R, I]],
+  ["#1", "sialoadenite necrotizzante", { sede: "Ghiandole salivari", natura: "non_neoplastica", tipo: "entita" }, ["ORL", R]],
   ["#2", "adenoma pleomorfo vs ca ex AP", { sede: "Ghiandole salivari", tipo: "ddx" }, ["ORL", R, I]],
   ["#3", "laringe: grading e fronte (eccezione confermata: stadiazione)", { sede: "Laringe e faringe", tipo: "stadiazione", campione: "pezzo_operatorio" }, ["ORL", R, I, TNM]],
   ["#4", "GBM: alterazioni da cercare", { sede: "Encefalo e midollo spinale", tipo: "test_sede" }, ["Cervello", R, I, NGS]],
   ["#5", "meningioma: grading (test in sede)", { sede: "Encefalo e midollo spinale", tipo: "test_sede" }, ["Cervello", R, I, NGS]],
-  ["#6", "HER2 e recettori", { sede: "Mammella", tipo: "entita" }, ["MAMMELLA", R, I]],
+  ["#6", "HER2 e recettori", { sede: "Mammella", tipo: "entita" }, ["MAMMELLA", R]],
   ["#7", "mammella pTNM e margini", { sede: "Mammella", tipo: "stadiazione", campione: "pezzo_operatorio" }, ["MAMMELLA", R, I, TNM]],
   ["#8", "sarcoma pleomorfo DDx", { sede: "Tessuti molli", tipo: "ddx" }, ["TESSUTI MOLLI", R, I]],
   ["#9", "lipoma vs LPS ben differenziato", { sede: "Tessuti molli", tipo: "ddx" }, ["TESSUTI MOLLI", R, I]],
@@ -25,10 +25,10 @@ const CASI = [
   ["#14", "urotelio pT", { sede: "Vescica, vie urinarie, uraco", tipo: "stadiazione", campione: "pezzo_operatorio" }, ["UROPATOLOGIA", R, I, TNM]],
   ["#15", "polmone PD-L1", { sede: "Polmone", tipo: "pdl1" }, ["POLMONE", R, I, "PDL-1"]],
   ["#16", "polmone EGFR/ALK", { sede: "Polmone", tipo: "test_sede" }, ["POLMONE", R, I, NGS]],
-  ["#17", "melanoma uveale prognosi", { sede: "Melanoma oculare (uveale, congiuntivale)", tipo: "entita" }, ["OFTALMOLOGIA", R, I]],
+  ["#17", "melanoma uveale prognosi", { sede: "Melanoma oculare (uveale, congiuntivale)", tipo: "entita" }, ["OFTALMOLOGIA", R]],
   ["#18", "angiosarcoma vs emangioma", { sede: "Tumore vascolare", tipo: "ddx" }, ["TESSUTI MOLLI", "VASCOLARE", R, I]],
-  ["#19", "epatite autoimmune", { sede: "Fegato", natura: "non_neoplastica", tipo: "entita" }, ["GASTROINTESTINALE", R, I]],
-  ["#20", "linfoma di Hodgkin", { sede: "Linfonodo", tipo: "entita" }, ["EMATOLOGIA", R, I]],
+  ["#19", "epatite autoimmune", { sede: "Fegato", natura: "non_neoplastica", tipo: "entita" }, ["GASTROINTESTINALE", R]],
+  ["#20", "linfoma di Hodgkin", { sede: "Linfonodo", tipo: "entita" }, ["EMATOLOGIA", R]],
   ["#21", "fascite nodulare vs sarcoma", { sede: "Tessuti molli", tipo: "ddx" }, ["TESSUTI MOLLI", R, I]],
   ["#22", "vasculite renale nel quadro sistemico", { sede: "Vasculite o arterite (qualsiasi sede)", natura: "non_neoplastica", tipo: "clinico" }, ["VASCOLARE", R, I, HAR]],
   ["reale-tiroide", "NIFTP vs IEFVPTC", { sede: "Tiroide", tipo: "ddx" }, ["ORL", R, I]],

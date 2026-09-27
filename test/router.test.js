@@ -26,19 +26,19 @@ test("sentinella senza primitivo → avviso, nessun set", () => {
 
 test("sentinella con primitivo mammella → MAMMELLA, non EMATOLOGIA", () => {
   const r = route({ ...base, sede: "Linfonodo sentinella", primitivo: "Mammella" }, REG);
-  assert.deepEqual(nomi(r), ["IMMUNOISTOCHIMICA", "MAMMELLA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(r), ["MAMMELLA", "ROSAI 2018"]);
   assert.ok(r.motivi[0].includes("primitivo: Mammella"));
 });
 
 test("mediastino tumorale → solo generalisti, niente Fletcher, avviso pre-WHO 5", () => {
   const r = route({ ...base, sede: "Mediastino e timo" }, REG);
-  assert.deepEqual(nomi(r), ["IMMUNOISTOCHIMICA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(r), ["ROSAI 2018"]);
   assert.ok(r.avvisi.includes(REG.bigino_testi.avviso_pre_who5));
 });
 
 test("encefalo non neoplastico → Harrison, non Cervello", () => {
   const r = route({ ...base, sede: "Encefalo e midollo spinale", natura: "non_neoplastica" }, REG);
-  assert.deepEqual(nomi(r), ["Harrison 22 ed. Principi di Medicina Interna", "IMMUNOISTOCHIMICA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(r), ["Harrison 22 ed. Principi di Medicina Interna", "ROSAI 2018"]);
 });
 
 test("rene patologia medica non neoplastica → Harrison", () => {
@@ -111,7 +111,7 @@ test("proprietà: ogni combinazione dà ≤ 2 topici e solo nomi esistenti", () 
             n.forEach((x) => assert.ok(esistenti.has(x), "nome inesistente: " + x));
             if (n.length > 0) {
               assert.ok(n.includes("ROSAI 2018"), voce.voce + ": manca ROSAI 2018 → " + n.join(", "));
-              assert.ok(n.includes("IMMUNOISTOCHIMICA"), voce.voce + ": manca IMMUNOISTOCHIMICA → " + n.join(", "));
+              assert.equal(n.includes("IMMUNOISTOCHIMICA"), tipo.id !== "entita", voce.voce + " / " + tipo.id + ": IMMUNOISTOCHIMICA → " + n.join(", "));
               assert.equal(n.length, new Set(n).size, voce.voce + ": duplicati → " + n.join(", "));
               assert.ok(r.domanda.length > 0, voce.voce + ": domanda vuota con notebook non vuoto");
             }
@@ -141,7 +141,7 @@ test("sentinella: primitivo non idoneo → avviso; primitivo mammella con natura
     { ...base, sede: "Linfonodo sentinella", primitivo: "Mammella", natura: "non_neoplastica" },
     REG
   );
-  assert.deepEqual(nomi(forzata), ["IMMUNOISTOCHIMICA", "MAMMELLA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(forzata), ["MAMMELLA", "ROSAI 2018"]);
 });
 
 test("tipo sconosciuto → set presente, domanda vuota, avviso tipo_mancante", () => {
@@ -158,15 +158,15 @@ test("refertazione su Prostata senza campione → avviso campione_mancante, nien
   assert.ok(r.domanda.includes("{campione}"));
 });
 
-test("Fletcher: Paratiroidi neoplastico → Fletcher 2021 + ROSAI + IIC e avviso pre-WHO 5", () => {
+test("Fletcher: Paratiroidi neoplastico → Fletcher 2021 + ROSAI (entità: senza IIC) e avviso pre-WHO 5", () => {
   const r = route({ ...base, sede: "Paratiroidi" }, REG);
-  assert.deepEqual(nomi(r), ["Fletcher 2021", "IMMUNOISTOCHIMICA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(r), ["Fletcher 2021", "ROSAI 2018"]);
   assert.ok(r.avvisi.includes(REG.bigino_testi.avviso_pre_who5));
 });
 
-test("Rene: patologia medica neoplastico → solo ROSAI + IIC (senza_fletcher)", () => {
+test("Rene: patologia medica neoplastico → solo ROSAI (senza_fletcher; entità: senza IIC)", () => {
   const r = route({ ...base, sede: "Rene: patologia medica" }, REG);
-  assert.deepEqual(nomi(r), ["IMMUNOISTOCHIMICA", "ROSAI 2018"]);
+  assert.deepEqual(nomi(r), ["ROSAI 2018"]);
 });
 
 test("solo_neoplastico: Colecisti e vie biliari non neoplastico, refertazione su pezzo operatorio → niente TNM", () => {
@@ -244,4 +244,21 @@ test("elencoNotebook: uno, due, tre nomi", () => {
   assert.equal(elencoNotebook(["ORL"]), '"ORL"');
   assert.equal(elencoNotebook(["ORL", "ROSAI 2018"]), '"ORL" e "ROSAI 2018"');
   assert.equal(elencoNotebook(["A", "B", "C"]), '"A", "B" e "C"');
+});
+
+test("tranne_tipi: Singola entità esclude IMMUNOISTOCHIMICA, con motivo", () => {
+  const r = route({ ...base, sede: "Tiroide" }, REG);
+  assert.deepEqual(nomi(r), ["ORL", "ROSAI 2018"]);
+  assert.ok(r.motivi.includes('IMMUNOISTOCHIMICA escluso: tipo "Singola entità"'), r.motivi.join(" | "));
+  assert.ok(!r.domanda.includes("IMMUNOISTOCHIMICA"));
+});
+
+test("tranne_tipi: diagnosi differenziale mantiene IMMUNOISTOCHIMICA", () => {
+  const r = route({ ...base, sede: "Tiroide", tipo: "ddx", x: "A", y: "B" }, REG);
+  assert.deepEqual(nomi(r), ["IMMUNOISTOCHIMICA", "ORL", "ROSAI 2018"]);
+});
+
+test("tranne_tipi: tipo sconosciuto mantiene IMMUNOISTOCHIMICA", () => {
+  const r = route({ ...base, sede: "Tiroide", tipo: "non_esiste" }, REG);
+  assert.ok(nomi(r).includes("IMMUNOISTOCHIMICA"));
 });

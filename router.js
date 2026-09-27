@@ -80,12 +80,15 @@
       out.avvisi.push(reg.bigino_testi.avviso_pre_who5);
     }
 
-    // 3. Generalisti sempre inclusi
-    reg.generalisti_always.forEach((g) => aggiungi(g.name));
-    out.motivi.push("sempre: " + reg.generalisti_always.map((g) => g.name).join(" + "));
+    // 3. Generalisti sempre inclusi, salvo i tipi elencati in tranne_tipi
+    const tipo = reg.tipi_quesito.find((t) => t.id === input.tipo);
+    const sempre = reg.generalisti_always.filter((g) => !(tipo && (g.tranne_tipi || []).includes(tipo.id)));
+    sempre.forEach((g) => aggiungi(g.name));
+    out.motivi.push("sempre: " + sempre.map((g) => g.name).join(" + "));
+    reg.generalisti_always.filter((g) => !sempre.includes(g))
+      .forEach((g) => out.motivi.push(g.name + " escluso: tipo \"" + tipo.label + "\""));
 
     // 4. Generalisti condizionali per tipo di quesito
-    const tipo = reg.tipi_quesito.find((t) => t.id === input.tipo);
     if (!tipo) { out.avvisi.push(reg.testi_app.tipo_mancante); return out; }
 
     const campione = tipo.campione ? reg.campioni.find((c) => c.id === input.campione) : null;

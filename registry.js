@@ -206,7 +206,11 @@ const REGISTRY = {
     },
     {
       "name": "IMMUNOISTOCHIMICA",
-      "condiviso": true
+      "condiviso": true,
+      "tranne_tipi": [
+        "entita"
+      ],
+      "nota": "escluso per la singola entità (27 set 2026): ridondante con topico + ROSAI, sulla NIFTP nessuna fonte pertinente. Resta per DDx e pannelli (unico con la disponibilità degli anticorpi in sede)."
     }
   ],
   "generalisti_conditional": [
@@ -733,7 +737,7 @@ const REGISTRY = {
     "nessun_topico": "Nessun topico per la sede → dillo, non forzare il topico più vicino.",
     "avviso_pre_who5": "Fletcher 2021 e ROSAI 2018 precedono la WHO 5ª ed. → verificare nosologia e classificazioni molecolari.",
     "conflitti": "Se più precedenze insieme portano a più di 2 topici → mostra i candidati e chiedi.",
-    "output": "> Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA [+ condizionali]\n> Motivo: <sede → topico; trigger → condizionali>\n> Domanda da incollare: \"<vedi regola sotto>\"\n",
+    "output": "> Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA (non per la singola entità) [+ condizionali]\n> Motivo: <sede → topico; trigger → condizionali>\n> Domanda da incollare: \"<vedi regola sotto>\"\n",
     "fraseggio_intro": "NON usare \"Diagnosi differenziale tra… / dammi la diagnosi\" → Gemini rifiuta\n(\"Sono solo un modello linguistico…\"). Formula SEMPRE in chiave descrittiva, adattando al tipo di quesito\n({NOTEBOOK} = elenco dei notebook proposti, tra virgolette; tienili comunque attaccati dal \"+\"):\n",
     "note_operative": [
       "In Gemini: + → Altri caricamenti → Notebooks → seleziona → Aggiungi → digita → invia.",

@@ -8,7 +8,7 @@ Poi attacco e invio io a mano. Solo materiale ANONIMO/di studio — mai dati di 
 ## Logica a due assi
 1. SEDE/organo → 1 notebook TOPICO (2 se ambiguo, segnalando "ambiguo"); mai più di 2.
 2. TIPO QUESITO → generalisti:
-   - SEMPRE: ROSAI 2018 + IMMUNOISTOCHIMICA.
+   - SEMPRE: ROSAI 2018 + IMMUNOISTOCHIMICA (tranne tipo: Singola entità).
    - CONDIZIONALI (solo se scatta il trigger):
      - Fletcher 2021 → quesito su un TUMORE la cui sede non ha topico (trattato generale dei tumori per organo).
      - NGS al FBF → solo test eseguibili in sede: "quale test molecolare posso fare/richiedere" (anche terapia target, o grading SNC quando serve sapere quali test si fanno in sede). NON per la biologia molecolare dell'entità. La biologia molecolare dell'entità sta nel topico e in ROSAI.
@@ -54,7 +54,7 @@ Nessun topico per la sede → dillo, non forzare il topico più vicino.
 - Fletcher 2021 e ROSAI 2018 precedono la WHO 5ª ed. → verificare nosologia e classificazioni molecolari.
 
 ## Output che voglio da te
-> Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA [+ condizionali]
+> Notebook da attaccare: {TOPICO} + ROSAI 2018 + IMMUNOISTOCHIMICA (non per la singola entità) [+ condizionali]
 > Motivo: <sede → topico; trigger → condizionali>
 > Domanda da incollare: "<vedi regola sotto>"
 

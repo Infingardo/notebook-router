@@ -8,6 +8,7 @@ const { route } = require("../router.js");
 
 const FIX = (f) => fs.readFileSync(path.join(__dirname, "fixtures", "notebooklm", f), "utf8");
 const TIROIDE = { sede: "Tiroide", natura: "neoplastica", tipo: "entita", x: "NIFTP" };
+const TIROIDE_DDX = { sede: "Tiroide", natura: "neoplastica", tipo: "ddx", x: "NIFTP", y: "IEFVPTC" };
 
 // Esecutore finto: registra le chiamate e risponde per comando.
 function finto(opz = {}) {
@@ -41,7 +42,7 @@ test("interroga i notebook del set, in ordine, con domanda per singolo notebook"
   const out = interroga(TIROIDE, REG, f.esegui);
   assert.equal(out.stato, "ok");
   const asks = f.chiamate.filter((a) => a[0] === "ask");
-  assert.deepEqual(asks.map((a) => a[a.indexOf("-n") + 1]), ["nb-orl", "nb-rosai", "nb-iic"]);
+  assert.deepEqual(asks.map((a) => a[a.indexOf("-n") + 1]), ["nb-orl", "nb-rosai"]); // entità: senza IIC
   assert.ok(asks[0][1].startsWith("Domanda indipendente dalle precedenti: usando SOLO questo notebook (\"ORL\")"), asks[0][1]);
   assert.ok(asks[0][1].includes("relativi a: NIFTP."));
   assert.ok(asks[0].includes("--json"));
@@ -61,11 +62,10 @@ test("un notebook in errore non ferma gli altri", () => {
   assert.equal(out.stato, "ok");
   assert.match(out.risposte[1].errore, /ask fallito/);
   assert.equal(out.risposte[0].errore, null);
-  assert.equal(out.risposte[2].errore, null);
 });
 
 test("output non JSON su un notebook → errore solo per quel notebook", () => {
-  const out = interroga(TIROIDE, REG, finto({ askNonJson: "nb-iic" }).esegui);
+  const out = interroga(TIROIDE_DDX, REG, finto({ askNonJson: "nb-iic" }).esegui);
   assert.match(out.risposte[2].errore, /non JSON/);
   assert.equal(out.risposte[0].errore, null);
 });
@@ -81,7 +81,7 @@ test("login non valido → nessuna domanda", () => {
 test("notebook non trovato o doppio → fermo, nessuna domanda", () => {
   const senzaIic = JSON.stringify({ notebooks: [{ id: "nb-orl", title: "ORL" }, { id: "nb-rosai", title: "ROSAI 2018" }] });
   const f1 = finto({ list: senzaIic });
-  const o1 = interroga(TIROIDE, REG, f1.esegui);
+  const o1 = interroga(TIROIDE_DDX, REG, f1.esegui);
   assert.equal(o1.stato, "fermo");
   assert.ok(o1.avvisi.some((a) => /non trovato: IMMUNOISTOCHIMICA/.test(a)));
   assert.equal(f1.chiamate.filter((a) => a[0] === "ask").length, 0);

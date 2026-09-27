@@ -96,6 +96,15 @@ def valida(r)
   r["campioni"].each { |c| e << "campione #{c['id']}: manca 'label'" unless c["label"].is_a?(String) }
   campioni = r["campioni"].map { |c| c["id"] }
   campioni.group_by { |i| i }.each { |i, g| e << "campione duplicato: #{i}" if g.size > 1 }
+  r["generalisti_always"].each do |g|
+    next unless g.key?("tranne_tipi")
+    val = g["tranne_tipi"]
+    unless val.is_a?(Array) && val.all? { |x| x.is_a?(String) }
+      e << "#{g['name']}: tranne_tipi deve essere una lista di stringhe"
+      next
+    end
+    val.each { |t| e << "#{g['name']}: tranne_tipi: tipo inesistente '#{t}'" unless ids.include?(t) }
+  end
   tipi_con_campione = r["tipi_quesito"].select { |t| t["campione"] }.map { |t| t["id"] }
   r["generalisti_conditional"].each do |g|
     if g.key?("tipi")
@@ -158,7 +167,11 @@ def render_bigino(r)
   out << "## Logica a due assi"
   out << "1. #{t['sede']}"
   out << "2. TIPO QUESITO → generalisti:"
-  out << "   - SEMPRE: #{r['generalisti_always'].map { |g| g['name'] }.join(' + ')}."
+  sempre = r["generalisti_always"].map do |g|
+    tranne = Array(g["tranne_tipi"]).map { |id| r["tipi_quesito"].find { |t| t["id"] == id }["label"] }
+    tranne.empty? ? g["name"] : "#{g['name']} (tranne tipo: #{tranne.join(', ')})"
+  end
+  out << "   - SEMPRE: #{sempre.join(' + ')}."
   out << "   - CONDIZIONALI (solo se scatta il trigger):"
   r["generalisti_conditional"].each { |g| out << "     - #{g['name']} → #{g['bigino']}" }
   out << ""
