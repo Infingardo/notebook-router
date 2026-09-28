@@ -123,7 +123,9 @@
       lista.forEach((v) => og.appendChild(new Option(v.voce, v.voce)));
       select.appendChild(og);
     });
-    if ([...select.options].some((o) => o.value === prima)) select.value = prima;
+    const voci_filtrate = [...select.options].filter((o) => o.value);
+    if (filtro && voci_filtrate.length === 1) select.value = voci_filtrate[0].value;
+    else if (voci_filtrate.some((o) => o.value === prima)) select.value = prima;
     return gruppi.size > 0;
   }
 
